@@ -57,7 +57,7 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
 
-            int i = preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
             System.out.printf("user - %s %s, was added.\n", name, lastName);
 
         } catch (SQLException e) {
@@ -69,9 +69,9 @@ public class UserDaoJDBCImpl implements UserDao {
     public void removeUserById(long id) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(REMOVINGSTR)) {
             preparedStatement.setLong(1, id);
-            int i = preparedStatement.executeUpdate();
+            preparedStatement.executeUpdate();
 
-            System.out.printf("users with id - %d, was remove. Num of deleted line - %d", id, i);
+            System.out.printf("users with id - %d, was remove.", id);
         }catch (SQLException e) {
             System.out.println("Oops, something wrong with removing");
             e.printStackTrace();
