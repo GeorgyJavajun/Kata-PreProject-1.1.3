@@ -33,8 +33,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void createUsersTable() {
         try (Statement statement = connection.createStatement() ) {
+            connection.setAutoCommit(false);
             statement.executeUpdate(CREATINGSTR);
             System.out.println("Successfully creating table \"users\"");
+            connection.commit();
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with creating");
             e.printStackTrace();
@@ -43,8 +45,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void dropUsersTable() {
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.executeUpdate(DROPINGSTR);
             System.out.println("Successfully drop table \"users\"");
+            connection.commit();
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with drop");
             e.printStackTrace();
@@ -53,11 +57,13 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void saveUser(String name, String lastName, byte age) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(SAVINGSTR)) {
+            connection.setAutoCommit(false);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
             preparedStatement.executeUpdate();
             System.out.printf("user - %s %s, was added.\n", name, lastName);
+            connection.commit();
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with saving");
             e.printStackTrace();
@@ -66,9 +72,11 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void removeUserById(long id) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(REMOVINGSTR)) {
+            connection.setAutoCommit(false);
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
             System.out.printf("users with id - %d, was remove.", id);
+            connection.commit();
         }catch (SQLException e) {
             System.out.println("Oops, something wrong with removing");
             e.printStackTrace();
@@ -80,6 +88,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
         try (Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(GETINGSTR)) {
+            connection.setAutoCommit(false);
             while (resultSet.next()) {
                 User bufferUser = new User();
 
@@ -90,6 +99,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
                 users.add(bufferUser);
             }
+            connection.commit();
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with getting");
             e.printStackTrace();
@@ -99,8 +109,10 @@ public class UserDaoJDBCImpl implements UserDao {
 
     public void cleanUsersTable() {
         try (Statement statement = connection.createStatement()) {
+            connection.setAutoCommit(false);
             statement.execute(CLEANINGSTR);
             System.out.println("Table was cleaning");
+            connection.commit();
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with cleaning");
             e.printStackTrace();
