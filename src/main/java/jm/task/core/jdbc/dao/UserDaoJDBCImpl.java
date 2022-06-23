@@ -21,14 +21,14 @@ public class UserDaoJDBCImpl implements UserDao {
     private final static String REMOVINGSTR = "DELETE FROM users WHERE ID = ?";
     private final static String GETINGSTR = "SELECT * FROM users";
     private final static String CLEANINGSTR = "TRUNCATE TABLE users";
+    private final Connection connection = Util.getConnect();
+
 
 
     public UserDaoJDBCImpl() {
 
     }
 
-
-    Connection connection = Util.getConnect();
 
 
     public void createUsersTable() {
