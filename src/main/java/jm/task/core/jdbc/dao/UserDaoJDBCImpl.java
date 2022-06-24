@@ -2,8 +2,6 @@ package jm.task.core.jdbc.dao;
 
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
-
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,32 +30,50 @@ public class UserDaoJDBCImpl implements UserDao {
 
 
     public void createUsersTable() {
+        Savepoint savePoint = null;
+
         try (Statement statement = connection.createStatement() ) {
-            connection.setAutoCommit(false);
+            savePoint = connection.setSavepoint();
             statement.executeUpdate(CREATINGSTR);
             System.out.println("Successfully creating table \"users\"");
             connection.commit();
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with creating");
             e.printStackTrace();
+            try {
+                connection.rollback(savePoint);
+            } catch (SQLException ex) {
+                System.out.println("Trouble with rollback");
+                ex.printStackTrace();
+            }
         }
     }
 
     public void dropUsersTable() {
+        Savepoint savePoint = null;
+
         try (Statement statement = connection.createStatement()) {
-            connection.setAutoCommit(false);
+            savePoint = connection.setSavepoint();
             statement.executeUpdate(DROPINGSTR);
             System.out.println("Successfully drop table \"users\"");
             connection.commit();
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with drop");
             e.printStackTrace();
+            try {
+                connection.rollback(savePoint);
+            } catch (SQLException ex) {
+                System.out.println("Trouble with rollback ");
+                ex.printStackTrace();
+            }
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
+        Savepoint savePoint = null;
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(SAVINGSTR)) {
-            connection.setAutoCommit(false);
+            savePoint = connection.setSavepoint();
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setByte(3, age);
@@ -67,12 +83,20 @@ public class UserDaoJDBCImpl implements UserDao {
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with saving");
             e.printStackTrace();
+            try {
+                connection.rollback(savePoint);
+            } catch (SQLException ex) {
+                System.out.println("Trouble with rollback");
+                ex.printStackTrace();
+            }
         }
     }
 
     public void removeUserById(long id) {
+        Savepoint savePoint = null;
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(REMOVINGSTR)) {
-            connection.setAutoCommit(false);
+            savePoint = connection.setSavepoint();
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
             System.out.printf("users with id - %d, was remove.", id);
@@ -80,15 +104,23 @@ public class UserDaoJDBCImpl implements UserDao {
         }catch (SQLException e) {
             System.out.println("Oops, something wrong with removing");
             e.printStackTrace();
+            try {
+                connection.rollback(savePoint);
+            } catch (SQLException ex) {
+                System.out.println("Trouble with rollback");
+                ex.printStackTrace();
+            }
         }
     }
 
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
+        Savepoint savePoint = null;
 
         try (Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(GETINGSTR)) {
-            connection.setAutoCommit(false);
+            savePoint = connection.setSavepoint();
+
             while (resultSet.next()) {
                 User bufferUser = new User();
 
@@ -103,19 +135,33 @@ public class UserDaoJDBCImpl implements UserDao {
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with getting");
             e.printStackTrace();
+            try {
+                connection.rollback(savePoint);
+            } catch (SQLException ex) {
+                System.out.println("Trouble with rollback");
+                ex.printStackTrace();
+            }
         }
         return users;
     }
 
     public void cleanUsersTable() {
+        Savepoint savePoint = null;
+
         try (Statement statement = connection.createStatement()) {
-            connection.setAutoCommit(false);
+            savePoint = connection.setSavepoint();
             statement.execute(CLEANINGSTR);
             System.out.println("Table was cleaning");
             connection.commit();
         } catch (SQLException e) {
             System.out.println("Oops, something wrong with cleaning");
             e.printStackTrace();
+            try {
+                connection.rollback(savePoint);
+            } catch (SQLException ex) {
+                System.out.println("Trouble with rollback");
+                ex.printStackTrace();
+            }
         }
     }
 }
